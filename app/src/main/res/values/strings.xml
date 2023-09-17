@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">GithubUser</string>
+    <string name="searchbar_hint">Masukkan Username</string>
+
+    <string name="tab_text_1">Followers</string>
+    <string name="tab_text_2">Following</string>
+    <string name="userPhoto">user_photo</string>
+    <string name="userName">user_name</string>
+    <string name="textView">Text View\n</string>
+</resources>
