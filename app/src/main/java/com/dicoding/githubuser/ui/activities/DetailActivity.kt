@@ -1,5 +1,6 @@
 package com.dicoding.githubuser.ui.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -51,6 +52,16 @@ class DetailActivity : AppCompatActivity() {
 
                         binding.fabFavorite.setOnClickListener {
                             detailViewModel.toggleFavoriteUser(username, userDetail.data.avatarUrl)
+                        }
+
+                        binding.shareButton.setOnClickListener {
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, "Check out this awesome developer: ${userDetail.data.htmlUrl}")
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            startActivity(shareIntent)
                         }
                     }
 

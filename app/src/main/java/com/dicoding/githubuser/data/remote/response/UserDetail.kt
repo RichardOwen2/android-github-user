@@ -17,4 +17,7 @@ data class UserDetail(
 
     @field:SerializedName("name")
     val name: String? = null,
+
+    @field:SerializedName("html_url")
+    val htmlUrl: String? = null,
 )
