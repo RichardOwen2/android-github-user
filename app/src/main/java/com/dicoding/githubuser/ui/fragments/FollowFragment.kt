@@ -1,4 +1,4 @@
-package com.dicoding.githubuser.ui
+package com.dicoding.githubuser.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,14 +8,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dicoding.githubuser.data.response.UserList
+import com.dicoding.githubuser.data.Result
+import com.dicoding.githubuser.data.remote.response.User
 import com.dicoding.githubuser.databinding.FragmentFollowBinding
+import com.dicoding.githubuser.ui.adapters.FollowAdapter
+import com.dicoding.githubuser.ui.viewmodels.FollowViewModel
+import com.dicoding.githubuser.ui.viewmodels.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 
 class FollowFragment : Fragment() {
 
     private lateinit var binding: FragmentFollowBinding
-    private val followViewModel by viewModels<FollowViewModel>()
+    private val followViewModel: FollowViewModel by viewModels {
+        ViewModelFactory.getInstance(requireActivity())
+    }
     private var position: Int = 0
     private var username: String = ""
 
@@ -46,38 +52,36 @@ class FollowFragment : Fragment() {
             username = it.getString(ARG_USERNAME) as String
         }
 
-        followViewModel.user.observe(viewLifecycleOwner) {
-            setFollow(it)
-        }
-
-        followViewModel.isLoading.observe(viewLifecycleOwner) {
-            showLoading(it)
-        }
-
-        followViewModel.snackbarText.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { snackBarText ->
-                Snackbar.make(
-                    view,
-                    snackBarText,
-                    Snackbar.LENGTH_SHORT
-                ).show()
-            }
-        }
-
         if (savedInstanceState == null) {
             if (position == 1) {
-                followViewModel.getUserFollowers(username)
+                followViewModel.getUserFollowers(username).observe(viewLifecycleOwner) {
+                    setFollow(it)
+                }
             } else {
-                followViewModel.getUserFollowings(username)
+                followViewModel.getUserFollowings(username).observe(viewLifecycleOwner) {
+                    setFollow(it)
+                }
+
             }
         }
     }
 
-    private fun setFollow(user: List<UserList>) {
-        val adapter = FollowAdapter().apply {
-            submitList(user)
+    private fun setFollow(user: Result<List<User>?>) {
+        when (user) {
+            is Result.Loading -> showLoading(true)
+            is Result.Success -> {
+                showLoading(false)
+                val adapter = FollowAdapter().apply {
+                    submitList(user.data)
+                }
+                binding.rvFollowList.adapter = adapter
+            }
+
+            is Result.Error -> {
+                showLoading(false)
+                Snackbar.make(binding.root, user.error, Snackbar.LENGTH_SHORT).show()
+            }
         }
-        binding.rvFollowList.adapter = adapter
     }
 
     private fun showLoading(isLoading: Boolean) {

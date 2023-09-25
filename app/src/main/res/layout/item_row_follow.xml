@@ -16,7 +16,7 @@ xmlns:tools="http://schemas.android.com/tools"
         card_view:layout_constraintStart_toStartOf="parent"
         card_view:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars"
-        android:contentDescription="@string/userPhoto" />
+        android:contentDescription="@string/userPhoto"/>
 
     <TextView
         android:id="@+id/user_name"
@@ -26,7 +26,8 @@ xmlns:tools="http://schemas.android.com/tools"
         android:text="@string/userName"
         card_view:layout_constraintBottom_toBottomOf="parent"
         card_view:layout_constraintStart_toEndOf="@+id/user_photo"
-        card_view:layout_constraintTop_toTopOf="parent" />
+        card_view:layout_constraintTop_toTopOf="parent"
+        android:textColor="?attr/colorSecondary"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

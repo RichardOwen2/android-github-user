@@ -7,4 +7,6 @@
     <string name="userPhoto">user_photo</string>
     <string name="userName">user_name</string>
     <string name="textView">Text View\n</string>
+    <string name="favorite_button">favorite_button</string>
+    <string name="profile_picture">Profile Picture</string>
 </resources>

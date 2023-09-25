@@ -1,19 +1,26 @@
-package com.dicoding.githubuser.ui
+package com.dicoding.githubuser.ui.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dicoding.githubuser.data.response.UserList
+import com.dicoding.githubuser.data.Result
+import com.dicoding.githubuser.data.local.entity.UserEntity
 import com.dicoding.githubuser.databinding.ActivityMainBinding
+import com.dicoding.githubuser.ui.viewmodels.ViewModelFactory
+import com.dicoding.githubuser.ui.adapters.UserAdapter
+import com.dicoding.githubuser.ui.viewmodels.UserViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val userViewModel by viewModels<UserViewModel>()
+    private val userViewModel: UserViewModel by viewModels {
+        ViewModelFactory.getInstance(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,39 +33,38 @@ class MainActivity : AppCompatActivity() {
         val itemDecoration = DividerItemDecoration(this, layoutManager.orientation)
         binding.rvUserList.addItemDecoration(itemDecoration)
 
-        with (binding) {
+        with(binding) {
             searchView.apply {
                 setupWithSearchBar(searchBar)
                 this.editText
-                    .setOnEditorActionListener { textView, actionId, event ->
+                    .setOnEditorActionListener { _, _, _ ->
                         searchBar.text = searchView.text
-                        userViewModel.findUser(searchView.text.toString())
+                        userViewModel.findUsers(searchView.text.toString())
                         searchView.hide()
                         false
                     }
             }
         }
 
-        userViewModel.user.observe(this) {
-            setUserList(it)
-        }
+        userViewModel.findUsers("RichardOwen2").observe(this) { user ->
+            if (user != null) {
+                when (user) {
+                    is Result.Loading -> showLoading(true)
+                    is Result.Success -> {
+                        showLoading(false)
+                        setUserList(user.data)
+                    }
 
-        userViewModel.isLoading.observe(this) {
-            showLoading(it)
-        }
-
-        userViewModel.snackbarText.observe(this) {
-            it.getContentIfNotHandled()?.let { snackBarText ->
-                Snackbar.make(
-                    window.decorView.rootView,
-                    snackBarText,
-                    Snackbar.LENGTH_SHORT
-                ).show()
+                    is Result.Error -> {
+                        showLoading(false)
+                        Snackbar.make(binding.root, user.error, Snackbar.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
 
-    private fun setUserList(user: List<UserList>) {
+    private fun setUserList(user: List<UserEntity>) {
         val adapter = UserAdapter().apply {
             submitList(user)
         }
