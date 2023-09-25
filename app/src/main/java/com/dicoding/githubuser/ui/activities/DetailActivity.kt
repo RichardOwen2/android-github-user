@@ -75,14 +75,15 @@ class DetailActivity : AppCompatActivity() {
 
         detailViewModel.isUserFavorited(username).observe(this) {
             when (it) {
-                is Result.Loading -> showLoading(true)
+                is Result.Loading -> {
+                    // do nothing
+                }
+
                 is Result.Success -> {
-                    showLoading(false)
                     setFavoriteIcon(it.data)
                 }
 
                 is Result.Error -> {
-                    showLoading(false)
                     Snackbar.make(binding.root, it.error, Snackbar.LENGTH_SHORT).show()
                 }
             }

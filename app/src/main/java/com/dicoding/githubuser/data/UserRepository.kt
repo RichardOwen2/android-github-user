@@ -45,6 +45,11 @@ class UserRepository private constructor(
                         }
                         userDao.deleteAll()
                         userDao.insertUsers(userList)
+
+                    }
+                    val localData = userDao.getUsers()
+                    userResult.addSource(localData) { newData: List<UserEntity> ->
+                        userResult.value = Result.Success(newData)
                     }
                 }
             }
@@ -53,10 +58,7 @@ class UserRepository private constructor(
                 userResult.value = Result.Error(t.message.toString())
             }
         })
-        val localData = userDao.getUsers()
-        userResult.addSource(localData) { newData: List<UserEntity> ->
-            userResult.value = Result.Success(newData)
-        }
+
         return userResult
     }
 
