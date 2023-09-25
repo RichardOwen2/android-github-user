@@ -3,6 +3,7 @@ package com.dicoding.githubuser.data
 import androidx.lifecycle.MediatorLiveData
 import com.dicoding.githubuser.data.local.entity.UserEntity
 import com.dicoding.githubuser.data.local.room.UserDao
+import com.dicoding.githubuser.data.local.room.UserFavoriteDao
 import com.dicoding.githubuser.data.remote.response.User
 import com.dicoding.githubuser.data.remote.response.UserDetail
 import com.dicoding.githubuser.data.remote.response.UserResponse
@@ -16,6 +17,7 @@ import retrofit2.Response
 class UserRepository private constructor(
     private val apiService: ApiService,
     private val userDao: UserDao,
+    private val favoriteUserDao: UserFavoriteDao,
     private val appExecutors: AppExecutors
 ) {
     private val userResult = MediatorLiveData<Result<List<UserEntity>>>()
@@ -35,11 +37,9 @@ class UserRepository private constructor(
                     val userList = ArrayList<UserEntity>()
                     appExecutors.diskIO.execute {
                         users?.forEach { user ->
-                            val isUserFavorited = userDao.isUserFavorited(user.login)
                             val userEntity = UserEntity(
                                 user.login,
-                                user.avatarUrl,
-                                isUserFavorited
+                                user.avatarUrl
                             )
                             userList.add(userEntity)
                         }
@@ -82,7 +82,7 @@ class UserRepository private constructor(
         return detailResult
     }
 
-    fun getUserFollowings(username: String) : MediatorLiveData<Result<List<User>?>> {
+    fun getUserFollowings(username: String): MediatorLiveData<Result<List<User>?>> {
         followersResult.value = Result.Loading
         val client = ApiConfig.getApiService().getUserFollowing(username)
         client.enqueue(object : Callback<List<User>> {
@@ -104,7 +104,7 @@ class UserRepository private constructor(
         return followersResult
     }
 
-    fun getUserFollowers(username: String) : MediatorLiveData<Result<List<User>?>> {
+    fun getUserFollowers(username: String): MediatorLiveData<Result<List<User>?>> {
         followingsResult.value = Result.Loading
         val client = ApiConfig.getApiService().getUserFollowers(username)
         client.enqueue(object : Callback<List<User>> {
@@ -130,7 +130,7 @@ class UserRepository private constructor(
         isFavoriteResult.value = Result.Loading
 
         try {
-            val isFavorited = userDao.isUserFavoritedLiveData(login)
+            val isFavorited = favoriteUserDao.isUserFavoritedLiveData(login)
             isFavoriteResult.addSource(isFavorited) {
                 isFavoriteResult.value = Result.Success(it)
             }
@@ -141,11 +141,24 @@ class UserRepository private constructor(
         return isFavoriteResult
     }
 
-    fun toggleFavoriteUser(login: String) {
+    fun toggleFavoriteUser(login: String, avatarUrl: String?) {
         appExecutors.diskIO.execute {
-            val favorite = userDao.isUserFavorited(login)
-            userDao.updateFavoriteUser(login, !favorite)
+            val favorite = favoriteUserDao.isUserFavorited(login)
+            if (favorite) {
+                favoriteUserDao.delete(login)
+            } else {
+                favoriteUserDao.insertUser(UserEntity(login, avatarUrl))
+            }
         }
+    }
+
+    fun getFavoriteUsers(): MediatorLiveData<Result<List<UserEntity>>> {
+        favoriteResult.value = Result.Loading
+        val localData = favoriteUserDao.getUsers()
+        favoriteResult.addSource(localData) { newData: List<UserEntity> ->
+            favoriteResult.value = Result.Success(newData)
+        }
+        return favoriteResult
     }
 
     companion object {
@@ -154,10 +167,11 @@ class UserRepository private constructor(
         fun getInstance(
             apiService: ApiService,
             userDao: UserDao,
+            favoriteUserDao: UserFavoriteDao,
             appExecutors: AppExecutors
         ): UserRepository =
             instance ?: synchronized(this) {
-                instance ?: UserRepository(apiService, userDao, appExecutors)
+                instance ?: UserRepository(apiService, userDao, favoriteUserDao, appExecutors)
             }.also { instance = it }
     }
 }

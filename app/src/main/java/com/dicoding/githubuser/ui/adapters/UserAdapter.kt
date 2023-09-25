@@ -13,7 +13,7 @@ import com.dicoding.githubuser.data.local.entity.UserEntity
 import com.dicoding.githubuser.databinding.ItemRowUserBinding
 import com.dicoding.githubuser.ui.activities.DetailActivity
 
-class UserAdapter: ListAdapter<UserEntity, UserAdapter.MyViewHolder>(DIFF_CALLBACK) {
+class UserAdapter : ListAdapter<UserEntity, UserAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding = ItemRowUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(binding, parent.context)
@@ -24,9 +24,9 @@ class UserAdapter: ListAdapter<UserEntity, UserAdapter.MyViewHolder>(DIFF_CALLBA
         holder.bind(user)
     }
 
-    class MyViewHolder(private val binding: ItemRowUserBinding, private val context: Context)
-        : RecyclerView.ViewHolder(binding.root) {
-        fun bind(user: UserEntity){
+    class MyViewHolder(private val binding: ItemRowUserBinding, private val context: Context) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(user: UserEntity) {
             Glide.with(context)
                 .load(user.avatarUrl)
                 .apply(RequestOptions.circleCropTransform())
@@ -49,6 +49,7 @@ class UserAdapter: ListAdapter<UserEntity, UserAdapter.MyViewHolder>(DIFF_CALLBA
             override fun areItemsTheSame(oldItem: UserEntity, newItem: UserEntity): Boolean {
                 return oldItem.login == newItem.login
             }
+
             override fun areContentsTheSame(oldItem: UserEntity, newItem: UserEntity): Boolean {
                 return oldItem.login == newItem.login
             }

@@ -7,17 +7,17 @@ import androidx.room.RoomDatabase
 import com.dicoding.githubuser.data.local.entity.UserEntity
 
 @Database(entities = [UserEntity::class], version = 1, exportSchema = false)
-abstract class UserDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao
+abstract class FavoriteUserDatabase : RoomDatabase() {
+    abstract fun userFavoriteDao(): UserFavoriteDao
 
     companion object {
         @Volatile
-        private var instance: UserDatabase? = null
-        fun getInstance(context: Context): UserDatabase =
+        private var instance: FavoriteUserDatabase? = null
+        fun getInstance(context: Context): FavoriteUserDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
-                    UserDatabase::class.java, "User.db"
+                    FavoriteUserDatabase::class.java, "FavoriteUser.db"
                 ).build()
             }
     }

@@ -9,4 +9,7 @@
     <string name="textView">Text View\n</string>
     <string name="favorite_button">favorite_button</string>
     <string name="profile_picture">Profile Picture</string>
+    <string name="favorite_menu">favorite menu</string>
+    <string name="menu">menu</string>
+    <string name="dark_mode">Dark Mode</string>
 </resources>

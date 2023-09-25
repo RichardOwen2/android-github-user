@@ -8,13 +8,19 @@ import androidx.room.Query
 import com.dicoding.githubuser.data.local.entity.UserEntity
 
 @Dao
-interface UserDao {
+interface UserFavoriteDao {
     @Query("SELECT * FROM user")
     fun getUsers(): LiveData<List<UserEntity>>
 
-    @Query("DELETE FROM user")
-    fun deleteAll()
+    @Query("DELETE FROM user where login = :login")
+    fun delete(login: String)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertUsers(users: List<UserEntity>)
+    fun insertUser(users: UserEntity)
+
+    @Query("SELECT EXISTS(SELECT * FROM user WHERE login = :login)")
+    fun isUserFavorited(login: String): Boolean
+
+    @Query("SELECT EXISTS(SELECT * FROM user WHERE login = :login)")
+    fun isUserFavoritedLiveData(login: String): LiveData<Boolean>
 }

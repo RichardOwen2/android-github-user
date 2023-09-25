@@ -2,16 +2,13 @@ package com.dicoding.githubuser.ui.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.dicoding.githubuser.R
 import com.dicoding.githubuser.data.Result
-import com.dicoding.githubuser.data.local.entity.UserEntity
 import com.dicoding.githubuser.data.remote.response.UserDetail
 import com.dicoding.githubuser.databinding.ActivityDetailBinding
 import com.dicoding.githubuser.ui.viewmodels.DetailViewModel
@@ -51,6 +48,10 @@ class DetailActivity : AppCompatActivity() {
                     is Result.Success -> {
                         showLoading(false)
                         setUserDetail(userDetail.data)
+
+                        binding.fabFavorite.setOnClickListener {
+                            detailViewModel.toggleFavoriteUser(username, userDetail.data.avatarUrl)
+                        }
                     }
 
                     is Result.Error -> {
@@ -74,10 +75,6 @@ class DetailActivity : AppCompatActivity() {
                     Snackbar.make(binding.root, it.error, Snackbar.LENGTH_SHORT).show()
                 }
             }
-        }
-
-        binding.fabFavorite.setOnClickListener {
-            detailViewModel.toggleFavoriteUser(username)
         }
     }
 

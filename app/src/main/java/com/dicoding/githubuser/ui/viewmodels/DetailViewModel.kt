@@ -8,5 +8,5 @@ class DetailViewModel(private val userRepository: UserRepository) : ViewModel() 
 
     fun isUserFavorited(username: String) = userRepository.isUserFavorited(username)
 
-    fun toggleFavoriteUser(username: String) = userRepository.toggleFavoriteUser(username)
+    fun toggleFavoriteUser(username: String, avatarUrl: String?) = userRepository.toggleFavoriteUser(username, avatarUrl)
 }

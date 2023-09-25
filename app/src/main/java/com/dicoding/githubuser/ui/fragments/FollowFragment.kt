@@ -25,11 +25,6 @@ class FollowFragment : Fragment() {
     private var position: Int = 0
     private var username: String = ""
 
-    companion object {
-        const val ARG_POSITION = "section_number"
-        const val ARG_USERNAME = ""
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -86,5 +81,10 @@ class FollowFragment : Fragment() {
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    companion object {
+        const val ARG_POSITION = "section_number"
+        const val ARG_USERNAME = ""
     }
 }
